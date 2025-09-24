@@ -18,7 +18,7 @@ class DummyOperator(BaseOperator):
         context['task_instance'].xcom_push(key='key', value=random_number)
 
 
-dag = DAG('AirFlow_6_2', schedule='@daily', start_date=datetime(2024, 1, 1))
+dag = DAG('AirFlow_6_2', schedule_interval='@daily', start_date=datetime(2024, 1, 1))
 t1 = DummyOperator(task_id='task_1', dag=dag)
 t2 = DummyOperator(task_id='task_2', dag=dag)
 

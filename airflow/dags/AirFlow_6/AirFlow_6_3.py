@@ -6,7 +6,7 @@ from airflow.providers.http.sensors.http import HttpSensor
 
 import random
 
-dag = DAG('AirFlow_6_3', schedule='@daily', start_date=datetime(2024, 1, 1))
+dag = DAG('AirFlow_6_3', schedule_interval='@daily', start_date=datetime(2024, 1, 1))
 
 
 def response_check(response, task_instance):

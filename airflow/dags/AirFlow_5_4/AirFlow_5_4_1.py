@@ -21,7 +21,7 @@ dag_default_args = {
 # Здесь и далее код создание задачи-сенсора
 
 # dag = DAG(...)
-dag = DAG('AirFlow_5_4_1', schedule='@daily', default_args=dag_default_args)
+dag = DAG('AirFlow_5_4_1', schedule_interval='@daily', default_args=dag_default_args)
 
 sensor_default_args = {
     "poke_interval": 4,

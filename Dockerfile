@@ -4,6 +4,9 @@
 # команды которые мы укажем дальше
 FROM python:3.8 
 
+# Устанавливаем PYTHONPATH
+ENV PYTHONPATH=/root/airflow/plugins
+
 # Устанавливаем домашнюю директорию внутри контейнера
 # При первом запуске Airflow в каталоге $AIRFLOW_HOME
 # будет создан файл airflow.cfg.
@@ -34,8 +37,12 @@ RUN pip install apache-airflow[postgres]==${AIRFLOW_VERSION}
 # Установка визуального редактора для работы в Airflow UI
 # Дополнительная настройка чтобы можно было редактировать код
 # Внутри веб интерфейса
-RUN pip install connexion
-RUN pip install airflow-code-editor
+# RUN pip install airflow-code-editor==3.3.4
+# RUN pip install connexion==2.9.0
+# RUN pip install black fs-s3fs fs-gcsfs
+
+# RUN pip install airflow-code-editor
+# RUN pip install connexion
 RUN pip install black fs-s3fs fs-gcsfs
 
 # Слздадим отдельную папку для нашего скрипта запуска
