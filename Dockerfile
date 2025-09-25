@@ -44,6 +44,9 @@ RUN pip install apache-airflow[postgres]==${AIRFLOW_VERSION}
 # RUN pip install airflow-code-editor
 # RUN pip install connexion
 RUN pip install black fs-s3fs fs-gcsfs
+RUN pip install psycopg
+RUN pip install SQLAlchemy
+RUN pip install clickhouse-driver
 
 # Слздадим отдельную папку для нашего скрипта запуска
 # Затем скопируем сам скрипт и после чего выдадим расширеные права
