@@ -43,13 +43,14 @@ RUN pip install apache-airflow[postgres]==${AIRFLOW_VERSION}
 
 # RUN pip install airflow-code-editor
 # RUN pip install connexion
-pip install --upgrade pip
+RUN pip install --upgrade pip
 RUN pip install black fs-s3fs fs-gcsfs
 RUN pip install psycopg
 RUN pip install SQLAlchemy
 RUN pip install clickhouse-driver
-RUN pip install duckdb
+# RUN pip install --no-cache-dir duckdb==1.1.3
 RUN pip install pandasql
+RUN pip install pandas
 RUN pip install dask
 
 # Слздадим отдельную папку для нашего скрипта запуска
