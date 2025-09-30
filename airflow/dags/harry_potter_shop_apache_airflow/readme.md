@@ -12,29 +12,23 @@ House - атрибут персонажа, характеризующий Фак
 Кроме того, мастер данные по SKU могут меняться (как бы это не было нелепо в контексте тематики, но представим себе, что операторы, заполняющие мастер данные, могут ошибиться, и в какой-то момент поменять атрибут персонажа), а значит обращаться в REST API нужно при каждом запуске потока. 
 "  
 
-### [Мое решение](case_v4.xml)
+### [Мое решение](main_dag.py)
 
-Повествование будет представлено по шагам последовательности котороая должна соблюдаться для корректной работы потока.  
-![Flow_of_case_with_steps.png](PNG%2FFlow_of_case_with_steps.png)  
-[Файл](case_v4.xml) самого Flow.  
-1. Выгрузка файла  
-2. Присвоение атрибута key_verstamp для FlowFile, прибегнул к ExecuteScript, сам скрипт представлен в файле [ExecuteScript.py](ExecuteScript%2FExecuteScript.py). Значение атрибута извлекается из [key_verstamp.csv](key_verstamp%2Fkey_verstamp.csv) (при первом запуске, значение атрибута будет "0").  
-3. Присвоение атрибутов filename и schema.text  
-4. Создание SQL запросов к выгруженному файлу. CSV_lookup_file - необходим для выделения уникальных character_id и пустого столбца house. fresh_rows - выделение из выгруженного файла новых строк по признаку атрибута key_verstamp. last_verstamp - выделение значения verstamp последней строки в выгруженном файле шага 1.  
-5. Короткий Flow который создает файл с [key_verstamp.csv](key_verstamp%2Fkey_verstamp.csv) выгружая туда значение SQL запроса last_verstamp шага 4.  
-6. Разбиение результата запроса CSV_lookup_file на отдельные строки из шага 4.  
-7. Создание атрибута character_id путем извлечения значения из текста регулярным выражением "(........-....-....-....-............)".  
-8. Присвоение атрибутов filename и schema.text.  
-9. Обогащение Flowfiles значения столбца house для каждого character_id путем обращения к API через Lookup Service "RestLookupService_look". В URL этого "RestLookupService_look" подставляется значение character_id из шага 7 https://hp-api.onrender.com/api/character/${character_id}  
-10. Оъединение всех Flowfiles в один файл.  
-11. Выгрузка результатов в [CSV_lookup_file.csv](CSV_lookup_file%2FCSV_lookup_file.csv)  
-12. Шаг выполняет задачу "задержки" Flowfile по времени, до окончания формирования [CSV_lookup_file.csv](CSV_lookup_file%2FCSV_lookup_file.csv)  
-13. fresh_rows через Lookup Service "CSVRecordLookupService_look" обогащается столбцом house из [CSV_lookup_file.csv](CSV_lookup_file%2FCSV_lookup_file.csv) по ключевому столбцу character_id.  
-14. SQL запрос приводящий данные к финальному запрашиваемому виду "sale_date - house - amount - last_verstamp".  
-15. Выгрузка в файловую систему.  
-### Полезные ссылки которые пригодились при выполнении задания 
-[How to run Custom Scripts in Apache NiFi](https://github.com/InsightByte/ApacheNifi/tree/main/Custom-Scripts)  
-[Регулярные выражения, онлайн](https://regex101.com/)  
-[Обращение к контенту JSON](https://github.com/json-path/JsonPath)  
-[JSONPath Online Evaluator](https://jsonpath.com/)  
-[Apache NiFi Expression Language Guide](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html)
+Повествование будет представлено по шагам последовательности котороая должна соблюдаться для корректной работы потока. 
+
+![UI Airflow harry_potter_shop_apache_airflow](PNG%2Fharry_potter_shop_apache_airflow_ui.png)
+
+[Файл](main_dag.py) самого DAG.
+[docker-compose.yml](../../../docker-compose.yml) и [Dockerfile](../../../Dockerfile) в которые были собраны и в которых были подняты образы в папке где они располагались командой ниже:
+```bash
+sudo docker-compose build --no-cache && sudo docker-compose up -d
+```
+1. **create_file_key_verstamp**. Эта функция создает файл в котором мы будем хранить наиболее актуальный key_verstamp последней выгрузки.
+2. **compute_house_sales**. Эта функция читатет key_verstamp последней выгрузки.
+3. **compute_house_sales**. Читает sales.csv и фильтрует его по key_verstamp последней выгрузки, отбирая строки свежее чем key_verstamp последней выгрузки.
+4. **compute_house_sales**. Обращается к внешнему API функции /characters и оставляет только нужные нам столбцы ["id", "name", "house"].
+5. **compute_house_sales**. Джоинит информацию от API функции /characters с информацией sales.csv, применяет к нему агрегацию для ответа на поставленный вопрос выше.
+6. **compute_house_sales**. Создает CSV с результатом запроса в house_sales.
+7. **update_actual_key_verstamp**. Читает данные из sales.csv и выбирает наиболее свежий key_verstamp, записывая его в key_verstamp.csv.
+
+**update_actual_key_verstamp** - можно не выносить в отдельную функцию от **compute_house_sales**, так даже правильнее, потому что пока мы выполняем **compute_house_sales** в нее могут быть добавлены новые строки, но десь "растянуто" для демонстрации.
