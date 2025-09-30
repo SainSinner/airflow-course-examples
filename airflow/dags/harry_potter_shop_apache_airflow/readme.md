@@ -19,7 +19,7 @@ House - атрибут персонажа, характеризующий Фак
 ![UI Airflow harry_potter_shop_apache_airflow](PNG%2Fharry_potter_shop_apache_airflow_ui.png)
 
 [Файл](main_dag.py) самого DAG.
-[docker-compose.yml](../../../docker-compose.yml) и [Dockerfile](../../../Dockerfile) в которые были собраны и в которых были подняты образы в папке где они располагались командой ниже:
+[docker-compose.yml](docker-compose.yml) и [Dockerfile](Dockerfile) в которые были собраны и в которых были подняты образы в папке где они располагались командой ниже:
 ```bash
 sudo docker-compose build --no-cache && sudo docker-compose up -d
 ```
